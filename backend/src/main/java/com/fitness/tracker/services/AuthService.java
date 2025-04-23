@@ -23,10 +23,17 @@ public class AuthService {
     }
 
     public String authenticate(String username, String password) {
+        System.out.println("Attempting login for: " + username);
         User user = userRepository.findByUsername(username);
-        if (user != null && passwordEncoder.matches(password, user.getPassword())) {
-            return jwtUtil.generateToken(user.getUsername());
+
+        if (user == null) {
+            throw new RuntimeException("User not found");
         }
-        throw new RuntimeException("Invalid credentials");
+
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new RuntimeException("Incorrect password");
+        }
+
+        return jwtUtil.generateToken(user.getUsername());
     }
 }
